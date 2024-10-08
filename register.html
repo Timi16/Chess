@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TChess - Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form id="registerForm">
+        <div>
+            <label for="registerUsername">Username:</label>
+            <input type="text" id="registerUsername" name="username" required>
+        </div>
+        <div>
+            <label for="registerEmail">Email:</label>
+            <input type="email" id="registerEmail" name="email" required>
+        </div>
+        <div>
+            <label for="registerPassword">Password:</label>
+            <input type="password" id="registerPassword" name="password" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+
+            if (!username || !email || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const response = await fetch('https://tchess-backend.onrender.com/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data && data.username) {
+                        // Store username in localStorage
+                        localStorage.setItem('username', data.username);
+                        // Redirect to home page
+                        window.location.href = 'home.html';
+                    } else {
+                        alert("Unexpected response from the server.");
+                    }
+                } else {
+                    alert(data.message || "Registration failed. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                alert("An error occurred during registration. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>
